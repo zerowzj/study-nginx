@@ -1,69 +1,14 @@
-###############################
-#（★）Server
-###############################
+#
 server:
   #address: 127.0.0.1
   port: 7000
-  http2:
-    enabled: true
-  #====================
-  #（▲）Tomcat
-  #====================
-  # 1.tomcat最大连接数取决于maxConnections这个值加上acceptCount这个值
-  # 2.在连接数达到了maxConnections之后，tomcat仍会保持住连接，但是不处理，等待其它请求处理完毕之后才会处理这个请求
-  tomcat:
-    #tomcat起动的最大线程数，即同时处理的任务个数
-    max-threads: 3
-    #最小工作空闲线程数，适当增大一些，以便应对突然增长的访问量
-    min-spare-threads: 3
-    #在同一时间，tomcat能够接受的最大连接数
-    #BIO模式下默认最大连接数是它的最大线程数；如果使用定制的Executor执行器，默认值将是执行器中maxthreads的值
-    #NIO模式下默认是10000
-    #APR模式则是8192(windows上则是低于或等于maxConnections的1024的倍数)。如果设置为-1则表示不限制
-    max-connections: 200
-    #当所有的请求处理线程都在使用时，所能接收的连接请求的队列的最大长度。当队列已满时，任何的连接请求都将被拒绝。
-    accept-count: 10
-  #====================
-  #（▲）Undertow
-  #====================
-  undertow:
-    #IO线程数, 它主要执行非阻塞的任务，它们会负责多个连接
-    io-threads: 100
-    #阻塞任务线程池，当执行类似servlet请求阻塞IO操作，undertow会从这个线程池中取得线程
-    worker-threads: 200
-    #
-    buffer-size: 1024
-    #是否分配的直接内存（NIO直接分配的堆外内存）
-    direct-buffers: true
 #
 logging:
-  config: classpath:logback-spring.xml
-###############################
-#（★）Spring
-###############################
+  config: classpath:logback.xml
+#
 spring:
   application:
-    name: study-springboot-mvc
+    name: study-nginx
   main:
     web-application-type: servlet
     banner-mode: console
-  profiles:
-    active: @env@
-  #====================
-  #（▲）文件上传
-  #====================
-  servlet:
-    multipart:
-      enabled: true
-      #单文件大小
-      max-file-size: 100MB
-      #总文件大小
-      max-request-size: 10MB
-  #====================
-  #（▲）
-  #====================
-  thymeleaf:
-    prefix: classpath:/templates
-    suffix: html
-    cache: false
-    mode: HTML

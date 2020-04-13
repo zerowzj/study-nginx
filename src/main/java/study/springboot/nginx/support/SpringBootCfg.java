@@ -1,4 +1,4 @@
-package study.springboot.mvc.support;
+package study.springboot.nginx.support;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
