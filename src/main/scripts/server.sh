@@ -3,8 +3,8 @@
 cd $(dirname $0)
 cd ..
 
-PROJECT_NAME=study-springboot-netty-socketio
-JAR_NAME=study-springboot-netty-socketio-1.0.jar
+PROJECT_NAME=study-nginx
+JAR_NAME=study-nginx-1.0.jar
 
 DEPLOY_HOME=$(pwd)
 LIB_DIR=$DEPLOY_HOME/lib
