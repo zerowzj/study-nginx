@@ -95,8 +95,31 @@
 
 
 
-
 1.2
+
+
+
+## 1.3 模块安装
+
+| 参数                                                         | 含义                                                     |
+| ------------------------------------------------------------ | -------------------------------------------------------- |
+| --prefix=PATH                                                | 指定安装路径，默认 /usr/local 下                         |
+| --sbin-path=PATH                                             | 指定 sbin 目录，一般不用指定，在安装目录下即可           |
+| --conf-path=PATH                                             | 指定配置文件的路径，也不用修改它，否则不好管理           |
+| --error-log-path=PATH 和 <br />--http-log-path=PATH（不建议指定） |                                                          |
+|                                                              |                                                          |
+| --user=USER 和 --group=GROUP                                 | 指定 nginx 允许的用户名和用户组，我们这里使用 nginx 用户 |
+| --with-http_ssl_module                                       | HTTPS 的关键模块                                         |
+| --with-http_realip_module                                    | 用于获取客户端请求的真实 IP 等作用                       |
+| --with-http_image_filter_module                              | 图片处理，实现图片放大缩小裁切等功能                     |
+| --with-http_geoip_module                                     | 用于 IP 访问控制，例如黑白名单                           |
+| --with-http_sub_module                                       | 用于字符串替换                                           |
+|                                                              |                                                          |
+|                                                              |                                                          |
+|                                                              |                                                          |
+|                                                              |                                                          |
+
+
 
 # 二. 配置（nginx.conf）
 
