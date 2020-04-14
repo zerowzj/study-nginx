@@ -84,7 +84,7 @@
                 <configuration>
                     <serverId>server_15</serverId>
                     <fromFile>target/${tar.file}</fromFile>
-                    <displayCommandOutputs>true</displayCommandOutputs>
+                    <displayCommandOutputs>false</displayCommandOutputs>
                     <commands>
                         <command>cd /${deploy.dir}; sudo rm -rf ${project.dir}</command>
                         <command>sudo tar -zxvf ${tar.file} -C .</command>
