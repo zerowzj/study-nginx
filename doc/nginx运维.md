@@ -220,7 +220,6 @@ http {
 user nobody nobody;
 worker_process 1;
 
-error_log logs/error.log info;
 pid logs/nginx.pid;
 ```
 
@@ -231,10 +230,6 @@ pid logs/nginx.pid;
 2. worker_processes
 
    主模块指令，指定了Nginx要开启的进程数。每个Nginx进程平均耗费10M~12M内存。建议指定和CPU的数量一致即可。
-
-3. error_log
-
-   主模块指令，用来定义全局错误日志文件。日志输出级别有debug、info、notice、warn、error、crit可供选择，其中，debug输出日志最为最详细，而crit输出日志最少。
 
 4. pid
 
@@ -263,9 +258,7 @@ event {
 
 
 
-## 2.3 http服务器配置
-
-### 2.3.1 全局配置
+## 2.3 http服务配置
 
 ```shell
 http {
@@ -301,15 +294,6 @@ http {
     client_body_timeout 10;
     #响应客户端超时时间
     send_timeout 10;
-    
-    #（▲）FastCGI相关参数是为了改善网站的性能：减少资源占用，提高访问速度
-    fastcgi_connect_timeout 300;
-    fastcgi_send_timeout 300;
-    fastcgi_read_timeout 300;
-    fastcgi_buffer_size 64k;
-    fastcgi_buffers 4 64k;
-    fastcgi_busy_buffers_size 128k;
-    fastcgi_temp_file_write_size 128k;
 }
 ```
 
@@ -327,85 +311,6 @@ http {
 
 5. sendfile
 
-### 2.3.1 日志配置
-
-```shell
-http {
-	#日志格式，main为格式名称
-    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-                    '$status $body_bytes_sent "$http_referer" '
-                    '"$http_user_agent" "$http_x_forwarded_for"';
-    #访问日志，指定的日志格式放在最后
-    access_log logs/access.log main;
-    #关闭日志
-    #access_log off;
-    
-    #错误日志
-    error_log logs/error.log crit;
-} 
-```
-
-1. log_format
-
-   | 变量                  | 含义             |
-   | --------------------- | ---------------- |
-   | $remote_addr          | 客户端的 IP 地址 |
-   | $remote_user          |                  |
-   | $time_local           |                  |
-   | $time_iso8601         |                  |
-   | $request              |                  |
-   | $status               |                  |
-   | $body_bytes_sent      |                  |
-   | $http_referer         |                  |
-   | $http_user_agent      |                  |
-   | $http_x_forwarded_for |                  |
-   | $connection           |                  |
-   | $connection_requests  |                  |
-   | $msec                 |                  |
-   | $pipe                 |                  |
-   | $request_length       |                  |
-   | $request_time         |                  |
-   |                       |                  |
-   |                       |                  |
-   |                       |                  |
-
-   
-
-   - $remote_addr 与$http_x_forwarded_for 用以记录客户端的ip地址
-   - $remote_user ：用来记录客户端用户名称；
-   - $time_local ：用来记录访问时间与时区；
-   - $request  ：用来记录请求的url与http协议；
-   - $status ：用来记录请求状态；
-   - $body_bytes_sent ：记录发送给客户端文件主体内容大小；
-   - $http_referer ：用来记录从那个页面链接访问过来的；
-   - $http_user_agent ：记录客户端浏览器的相关信息
-
-2. access_log：访问日志
-
-3. error_log：错误日志
-
-   
-
-### 2.3.1 Gzip配置
-
-```shell
-http {
-    gzip on; 
-    gzip_min_length 1k; 
-    gzip_buffers 4 16k;
-    gzip_http_version 1.0;
-    gzip_comp_level 2;
-    gzip_types text/plain application/x-javascript text/css application/xml;
-    gzip_vary on;
-}
-```
-
-1. gzip
-
-   用于设置开启或者关闭gzip模块，“gzip on”表示开启GZIP压缩，实时压缩输出数据流
-
-2. gzip_min_length
-
 
 
 ## 2.4 虚拟主机配置
@@ -419,13 +324,11 @@ server {
 	
 	#根目录
 	root /root/www.cszhi.com
-	#
-	index index.html index.htm index.php;
+	#默认页
+	index index.html;
 	
 	#编码格式，若网页格式与此不同，将被自动转码
 	charset UTF-8;
-	#虚拟主机访问日志
-	access_log logs/host.access.log main;
 }
 ```
 
@@ -439,19 +342,16 @@ server {
 
 3. root
 
-   用于指定虚拟主机的网页根目录，这个目录可以是相对路径，也可以是绝对路径。
+   指定虚拟主机的网页根目录，这个目录可以是相对路径，也可以是绝对路径。
 
 4. index
 
-   用于设定访问的默认首页地址。
+   设定访问的默认首页地址。多个的时候空格隔开。
 
 5. charset
 
    设置网页的默认编码格式。
 
-6. access_log
-
-   指定此虚拟主机的访问日志存放路径，最后的main用于指定访问日志的输出格式。
 
 
 
@@ -459,7 +359,7 @@ server {
 
 ​		location指令的作用是根据用户请求的URI来执行不同的应用，也就是根据用户请求的网站URL进行匹配，匹配成功即进行相关的操作。即：此模块专门将请求导向其他服务。
 
-### 2.5.1 location语法
+### 2.5.1 语法
 
 ```shell
 location [=|~|~*|^~] /uri/ {
@@ -467,34 +367,98 @@ location [=|~|~*|^~] /uri/ {
 }
 ```
 
-参数
-
-1. ```shell
-location = / {
-      #精确匹配访问网站根目录
-   }
-   location = /login {
-      #精确匹配http://xxx.com/login
-   }
-   ```
 
 
+## 2.6 日志配置
 
-
-## 2.6 负载均衡配置
-
-​		upstream是Nginx的HTTP Upstream模块，这个模块通过一个简单的调度算法来实现客户端IP到后端服务器的负载均衡。配置如下
+### 2.6.1 格式
 
 ```shell
-upstream NAME {
+http {
+	#日志格式，cst_fmt为格式名称
+    log_format cst_fmt '$remote_addr - $remote_user [$time_local] "$request" '
+                       '$status $body_bytes_sent "$http_referer" '
+                       '"$http_user_agent" "$http_x_forwarded_for"';
+}
+```
+
+​		日志内容参数如下：
+
+| 变量                  | 含义                               |
+| --------------------- | ---------------------------------- |
+| $remote_addr          | 客户端的 IP 地址                   |
+| $remote_user          |                                    |
+| $time_local           | 通用日志格式下的本地时间           |
+| $time_iso8601         | 标准格式下的本地时间               |
+| $request              | 请求的URL和HTTP协议                |
+| $status               | 请求状态                           |
+| $body_bytes_sent      | 记录发送给客户端文件主体内容大小； |
+| $http_referer         | 用来记录从那个页面链接访问过来的   |
+| $http_user_agent      | 记录客户端浏览器的相关信息         |
+| $http_x_forwarded_for |                                    |
+| $connection           |                                    |
+| $connection_requests  |                                    |
+| $msec                 |                                    |
+| $pipe                 |                                    |
+| $request_length       |                                    |
+| $request_time         |                                    |
+
+### 2.6.2 位置
+
+​		nginx 日志配置不同位置的不同含义：
+
+1.  nginx 配置文件的最外层，可以配置 error_log。这个 error_log 能够记录 nginx 启动过程中的异常，也能记录日常访问过程中遇到的错误。
+
+2.  http 段中可以配置 error_log 和 access_log。可以用于记录整个访问过程中成功的，失败的，错误的访问
+
+3. 在 server 内部配置属于专门 server 的 error_log 和 access_log。这是我们常用的，不同业务日志分开。
+
+   越往配置里层，优先级越高，意味着 server 的日志记录以后并不会因为你在外层写了日志而再次记录。结构如下：
+
+```shell
+#
+error_log  logs/error.log
+
+http {
+	#
+	access_log  logs/access.log  cst_fmt;
+	#
+	error_log  logs/error.log cst_fmt;
+	
+	server {
+		#
+		access_log  logs/host.access.log  cst_fmt;
+		#
+		error_log  logs/host.error.log cst_fmt;
+		
+		location = {
+			#
+			access_log logs/access.log  cst_fmt;
+			#
+			error_Log  logs/error.log  cst_fmt;
+		}
+	}
+}
+```
+
+
+
+## 2.7 模块配置
+
+### 2.7.1 负载均衡
+
+​		upstream是Nginx的HTTP upstream模块，这个模块通过一个简单的调度算法来实现客户端IP到后端服务器的负载均衡。配置如下
+
+```shell
+upstream cstm_pools {
 	#负载均衡算法
-	ip_hash;
-	#该节点不可用
+	ip_hash/fair/least_conn;
+	#
 	server 192.168.8.11:80;
 	#其他节点挂了后该节点自动上线
 	server 192.168.8.12:80 down;
 	#
-	server 192.168.8.13:8009 max_fails=3 fail_timeout=20s;
+	server 192.168.8.13:8009 weight=20 max_fails=3 fail_timeout=20s;
 	
 	#最多允许32个长连接
 	keepalive 32;
@@ -507,44 +471,65 @@ upstream NAME {
 
 1. 负载均衡算法
 
-   Nginx的负载均衡模块目前支持4种调度算法，下面进行分别介绍，其中后两项属于第三方的调度方法
+   ​	调度算法一般分为两类：
 
-   - 轮询（默认）：每个请求按时间顺序逐一分配到不同的后端服务器，如果后端某台服务器宕机，故障系统被自动剔除，使用户访问不受影响。
-   - weight：指定轮询权值，weight值越大，分配到的访问机率越高，主要用于后端每个服务器性能不均的情况下。
-   - ip_hash：每个请求按访问IP的hash结果分配，这样来自同一个IP的访客固定访问一个后端服务器，有效解决了动态网页存在的session共享问题。
-   - fair：比上面两个更加智能的负载均衡算法。此种算法可以依据页面大小和加载时间长短智能地进行负载均衡，也就是根据后端服务器的响应时间来分配请求，响应时间短的优先分配。Nginx本身是不支持fair的，如果需要使用这种调度算法，必须下载Nginx的upstream_fair模块。
-   - url_hash：按访问url的hash结果来分配请求，使每个url定向到同一个后端服务器，可以进一步提高后端缓存服务器的效率。Nginx本身是不支持url_hash的，如果需要使用这种调度算法，必须安装Nginx 的hash软件包。
+   - 静态调度算法，即负载均衡器根据自身设定的规则进行分配，不需要考虑后端节点服务器的情况。例如：rr、wrr、ip_hash等都属于静态调度算法。
+   - 动态调度算法，即负载均衡器会根据后端节点的当前状态来决定是否分发请求，例如：连接数少的有限获得请求，响应时间短的优先获得请求。例如：least_conn、fair 等都属于动态调度算法。
+
+   | 算法                | 描述                                                         |
+   | ------------------- | ------------------------------------------------------------ |
+   | 轮询（round robin） | 每个请求按时间顺序逐一分配到不同的后端服务器，如果后端某台服务器宕机，故障系统被自动剔除，使用户访问不受影响。 |
+   | 权重轮循（weight）  | 在 rr 轮循算法的基础上加上权重，即为权重轮循算法，当使用该算法时，权重和用户访问成正比，权重值越大，被转发的请求也就越多。可以根据服务器的配置和性能指定权重值大小，有效解决新旧服务器性能不均带来的请求分配问题。 |
+   | ip_hash             | 每个请求按访问IP的hash结果分配，这样来自同一个IP的访客固定访问一个后端服务器，有效解决了动态网页存在的session共享问题。但有时会导致请求分配不均，即无法保证 1:1 的负载均衡。注意：当负载调度算法为 ip_hash时，后端服务器在负载均衡调度中的状态不能有 weight 和 backup ，即使有也不会生效 |
+   | fair                | 根据后端节点服务器的响应时间来分配请求，响应时间短的优先分配。这是更加智能的调度算法。此种算法可以依据页面大小和加载时间长短只能地进行负载均衡，也就是根据后端服务器的响应时间来分配请求，响应时间短的优先分配。Nginx 本身是不支持 fair 调度算法的，如果需要使用这种调度算法，必须下载 Nginx 的相关模块 upstream_fair。 |
+   | least_conn          | 根据后端节点的连接数来决定分配情况，哪个机器连接数少就分发   |
+   | url_hash            | 按访问url的hash结果来分配请求，使每个url定向到同一个后端服务器，可以进一步提高后端缓存服务器的效率。Nginx本身是不支持url_hash的，如果需要使用这种调度算法，必须安装Nginx 的hash软件包。 |
 
 2. server
 
    指定后端服务器的IP地址和端口，同时还可以设定每个后端服务器在负载均衡调度中的状态。常用的状态有：
 
-   - down：表示当前的server暂时不参与负载均衡。
-   - backup：预留的备份机器。当其他所有的非backup机器出现故障或者忙的时候，才会请求backup机器，因此这台机器的压力最轻。
-   - max_fails：允许请求失败的次数，默认为1。当超过最大次数时，返回proxy_next_upstream 模块定义的错误。
-   - fail_timeout：在经历了max_fails次失败后，暂停服务的时间。max_fails可以和fail_timeout一起使用。
+   |              |                                                              |
+   | ------------ | ------------------------------------------------------------ |
+   | down         | 表示当前的server暂时不参与负载均衡                           |
+   | backup       | 预留的备份机器。当其他所有的非backup机器出现故障或者忙的时候，才会请求backup机器，因此这台机器的压力最轻 |
+   | max_fails    | 允许请求失败的次数，默认为1。当超过最大次数时，返回proxy_next_upstream 模块定义的错误 |
+   | fail_timeout | 在经历了max_fails次失败后，暂停服务的时间。max_fails可以和fail_timeout一起使用 |
 
 
 
-## 2.4 日志配置
+### 2.7.1 （反向）代理
 
-​		nginx 日志配置不同位置的不同含义：
+​		使用nginx配置代理的时候，是要用到http_proxy模块。这个模块也是在安装nginx的时候默认安装。它的作用就是将请求转发到相应的服务器。
 
-1. 在 nginx 配置文件的最外层，可以配置 error_log。这个 error_log 能够记录 nginx 启动过程中的异常，也能记录日常访问过程中遇到的错误
+​		在配置反向代理的时候，只要配置参数proxy_pass就能完成反向代理的功能，其余的参数结合自己的实际情况去添加，不添加也可以。
 
-2. 在 http 段中可以配置 error_log 和 access_log，可以用于记录整个访问过程中成功的，失败的，错误的访问
+| 参数                  | 范围                   | 描述                                                         |
+| --------------------- | ---------------------- | ------------------------------------------------------------ |
+| proxy_pass URL/IP     | location               | proxy_pass 后边配置ip地址也可以，配置域名也可以              |
+| proxy_buffering       | http、server、location | 用于开启对被代理服务器的应答缓存。当此参数处于off状态的时候，从被代理服务器上获取的响应内容会直接传送给，发送请求的客户端；当此参数处于on状态的时候，会从被代理服务器的应答保存到缓存里边，当应答无法在内存保存下的时候，就将部分写入磁盘 |
+| proxy_buffer_size     |                        |                                                              |
+| proxy_buffers         |                        |                                                              |
+|                       |                        |                                                              |
+| proxy_connect_timeout |                        | 用于设置和被代理服务器链接的超时时间，是代理服务器发起握手等待响应的超时时间。不要设置的太小，否则会报504错误。nginx服务器与被代理的服务器建立连接的超时时间，默认60秒 |
+| proxy_read_timeout    |                        | 用于设置从被代理服务器读取应答内容的超时时间。nginx服务器想被代理服务器组发出read请求后，等待响应的超时间，默认为60秒 |
+| proxy_send_timeout    |                        | nginx服务器想被代理服务器组发出write请求后，等待响应的超时间，默认为60秒 |
+|                       |                        |                                                              |
+|                       |                        |                                                              |
+|                       |                        |                                                              |
+|                       |                        |                                                              |
+|                       |                        |                                                              |
+|                       |                        |                                                              |
+|                       |                        |                                                              |
+|                       |                        |                                                              |
+|                       |                        |                                                              |
+|                       |                        |                                                              |
+|                       |                        |                                                              |
 
-3. 在 server 内部配置属于专门 server 的 error_log 和 access_log，这是我们常用的，不同业务日志分开。
 
-   ​	越往配置里层，优先级越高，意味着 server 的日志记录以后并不会因为你在外层写了日志而再次记录。
-
-
-
-## 2.4 反向代理
 
 ```shell
 http {
-	#（）
 	#启动代理缓存功能
 	proxy_buffering on;
 	#nginx跟后端服务器连接超时时间(代理连接超时)
@@ -570,9 +555,7 @@ http {
 	#指定临时缓存文件的存储路径(必须在同一分区)
 	proxy_temp_path /data/proxy/temp;
  
-	#（）服务配置
 	server {
-    	#侦听的80端口
     	listen 80;
     	server_name localhost;
     	location / {
@@ -591,24 +574,29 @@ http {
         	#文件过期时间控制
         	expires 1d;
     	}
-    	#配置手动清楚缓存(实现此功能需第三方模块 ngx_cache_purge)
-    	#http://www.123.com/2017/0316/17.html访问
-    	#http://www.123.com/purge/2017/0316/17.html清楚URL缓存
-    	location ~ /purge(/.*) {
-        	allow    127.0.0.1;
-        	deny    all;
-        	proxy_cache_purge    cache_one    $host$1$is_args$args;
-    	}
-    	#设置扩展名以.jsp、.php、.jspx结尾的动态应用程序不做缓存
-    	location ~.*\.(jsp|php|jspx)?$ { 
-        	proxy_set_header Host $host; 
-        	proxy_set_header X-Real-IP $remote_addr; 
-        	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;   
-        	proxy_pass http://IP;
-    	}
 }
 ```
 
+### 2.7.1 Gzip
 
+```shell
+http {
+    gzip on; 
+    gzip_min_length 1k; 
+    gzip_buffers 4 16k;
+    gzip_http_version 1.0;
+    gzip_comp_level 2;
+    gzip_types text/plain application/x-javascript text/css application/xml;
+    gzip_vary on;
+}
+```
+
+1. gzip
+
+   用于设置开启或者关闭gzip模块，“gzip on”表示开启GZIP压缩，实时压缩输出数据流
+
+2. gzip_min_length
 
 # 三. 应用
+
+## 3.1 动静分离
