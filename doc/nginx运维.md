@@ -331,15 +331,16 @@ http {
 
 ```shell
 http {
+	#日志格式，main为格式名称
     log_format main '$remote_addr - $remote_user [$time_local] "$request" '
                     '$status $body_bytes_sent "$http_referer" '
                     '"$http_user_agent" "$http_x_forwarded_for"';
-    #访问日志的路径，指定的日志格式放在最后
+    #访问日志，指定的日志格式放在最后
     access_log logs/access.log main;
     #关闭日志
     #access_log off;
     
-    #只记录更为严重的错误日志，减少IO压力
+    #错误日志
     error_log logs/error.log crit;
 } 
 ```
@@ -409,43 +410,67 @@ http {
 
 ## 2.4 虚拟主机配置
 
-### 2.4.1 基本配置
-
 ```shell
 server {
 	#监听端口
-	listen  80;
+	listen 80;
 	#访问域名
-	server_name  localhost;
+	server_name localhost;
 	
+	#根目录
+	root /root/www.cszhi.com
 	#
-	index  index.html  index.htm  index.php;
-	root  /wwwroot/www.cszhi.com
+	index index.html index.htm index.php;
 	
 	#编码格式，若网页格式与此不同，将被自动转码
-	charset  UTF-8;
-	#虚拟主机访问日志定义
-	access_log  logs/host.access.log  main;
+	charset UTF-8;
+	#虚拟主机访问日志
+	access_log logs/host.access.log main;
 }
 ```
 
-1. listen：指定虚拟主机的服务端口。
-2. server_name：用来指定IP地址或者域名，多个域名之间用空格分开。
-3. index：用于设定访问的默认首页地址
-4. root：用于指定虚拟主机的网页根目录，这个目录可以是相对路径，也可以是绝对路径
-5. charset：设置网页的默认编码格式
-6. access_log：指定此虚拟主机的访问日志存放路径，最后的main用于指定访问日志的输出格式。
+1. listen
 
-### 2.4.2 location配置
+   指定虚拟主机的服务端口。
+
+2. server_name
+
+   用来指定IP地址或者域名，多个域名之间用空格分开。
+
+3. root
+
+   用于指定虚拟主机的网页根目录，这个目录可以是相对路径，也可以是绝对路径。
+
+4. index
+
+   用于设定访问的默认首页地址。
+
+5. charset
+
+   设置网页的默认编码格式。
+
+6. access_log
+
+   指定此虚拟主机的访问日志存放路径，最后的main用于指定访问日志的输出格式。
+
+
+
+## 2.5 location配置
 
 ​		location指令的作用是根据用户请求的URI来执行不同的应用，也就是根据用户请求的网站URL进行匹配，匹配成功即进行相关的操作。即：此模块专门将请求导向其他服务。
 
-​		
+### 2.5.1 location语法
 
-1. ### 
+```shell
+location [=|~|~*|^~] /uri/ {
+	...
+}
+```
 
-   ```shell
-   location = / {
+参数
+
+1. ```shell
+location = / {
       #精确匹配访问网站根目录
    }
    location = /login {
@@ -456,9 +481,9 @@ server {
 
 
 
-## 2.3 负载均衡配置
+## 2.6 负载均衡配置
 
-​	upstream是Nginx的HTTP Upstream模块，这个模块通过一个简单的调度算法来实现客户端IP到后端服务器的负载均衡。配置如下
+​		upstream是Nginx的HTTP Upstream模块，这个模块通过一个简单的调度算法来实现客户端IP到后端服务器的负载均衡。配置如下
 
 ```shell
 upstream NAME {
@@ -499,6 +524,8 @@ upstream NAME {
    - max_fails：允许请求失败的次数，默认为1。当超过最大次数时，返回proxy_next_upstream 模块定义的错误。
    - fail_timeout：在经历了max_fails次失败后，暂停服务的时间。max_fails可以和fail_timeout一起使用。
 
+
+
 ## 2.4 日志配置
 
 ​		nginx 日志配置不同位置的不同含义：
@@ -510,6 +537,8 @@ upstream NAME {
 3. 在 server 内部配置属于专门 server 的 error_log 和 access_log，这是我们常用的，不同业务日志分开。
 
    ​	越往配置里层，优先级越高，意味着 server 的日志记录以后并不会因为你在外层写了日志而再次记录。
+
+
 
 ## 2.4 反向代理
 
