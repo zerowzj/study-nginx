@@ -51,7 +51,9 @@
    yum -y install openssl openssl-devel
    ```
 
-## 1.2 源码安装
+## 1.2 安装
+
+### 1.2.1 源码安装
 
 1. 解压
 
@@ -63,31 +65,39 @@
 
    ```shell
    ./configure \
-       --prefix=/usr/server/nginx1.16.1
-       --
-   
-   #执行结果
-   Configuration summary
-     + using system PCRE library
-     + OpenSSL library is not used
-     + using system zlib library
-   
-     nginx path prefix: "/usr/local/nginx1.16.1"
-     nginx binary file: "/usr/local/nginx1.16.1/sbin/nginx"
-     nginx modules path: "/usr/local/nginx1.16.1/modules"
-     nginx configuration prefix: "/usr/local/nginx1.16.1/conf"
-     nginx configuration file: "/usr/local/nginx1.16.1/conf/nginx.conf"
-     nginx pid file: "/usr/local/nginx1.16.1/logs/nginx.pid"
-     nginx error log file: "/usr/local/nginx1.16.1/logs/error.log"
-     nginx http access log file: "/usr/local/nginx1.16.1/logs/access.log"
-     nginx http client request body temporary files: "client_body_temp"
-     nginx http proxy temporary files: "proxy_temp"
-     nginx http fastcgi temporary files: "fastcgi_temp"
-     nginx http uwsgi temporary files: "uwsgi_temp"
-     nginx http scgi temporary files: "scgi_temp"
+       --prefix=/usr/server/nginx1.16.1 \
+       --with-http_stub_status_module
    ```
 
-3. 
+   配置参数如下：
+
+   | 参数                                                        | 含义                                                     |
+   | ----------------------------------------------------------- | -------------------------------------------------------- |
+   | --prefix=PATH                                               | 指定安装路径，默认 /usr/local 下                         |
+   | --sbin-path=PATH                                            | 指定 sbin 目录，一般不用指定，在安装目录下即可           |
+   | --conf-path=PATH                                            | 指定配置文件的路径，也不用修改它，否则不好管理           |
+   | --error-log-path=PATH 和--http-log-path=PATH（不建议指定）  | 默认日志路径，这个我们可以修改为我们设计的               |
+   | --pid-path=PATH 和 --lock-path=PATH（不建议指定）           | pid 文件和 lock 文件路径，我们也可以把它放到 logs 目录下 |
+   | --user=USER 和 --group=GROUP                                | 指定 nginx 允许的用户名和用户组，我们这里使用 nginx 用户 |
+   | --with-http_ssl_module                                      | HTTPS 的关键模块                                         |
+   | --with-http_realip_module                                   | 用于获取客户端请求的真实 IP 等作用                       |
+   | --with-http_image_filter_module                             | 图片处理，实现图片放大缩小裁切等功能                     |
+   | --with-http_geoip_module                                    | 用于 IP 访问控制，例如黑白名单                           |
+   | --with-http_sub_module                                      | 用于字符串替换                                           |
+   | --with-http_flv_module 和 --with-http_mp4_module            | 流媒体处理模块                                           |
+   | --with-http_gunzip_module 和 --with-http_gzip_static_module | 资源压缩，静态资源压缩                                   |
+   | --without-http_auth_basic_module                            | 禁用用户认证模块，该模块可以用于网页登录验证             |
+   | --with-http_auth_request_module                             | 支持第三方认证                                           |
+   | --with-http_stub_status_module                              | nginx 状态                                               |
+   | --with-stream                                               | TCP/UDP 代理模块                                         |
+   | --with-pcre=DIR                                             | 指定 PCRE 目录                                           |
+   | --with-zlib=DIR                                             | 指定 zlib 目录                                           |
+   | --with-openssl=DIR                                          | 指定 openssl 目录                                        |
+   | --with-http_addition_module                                 | 用于给响应的网站追加内容，比如追加 css / js              |
+   | --with-http_random_index_module                             | 从目录中随机挑选索引                                     |
+   | --add-module=PATH                                           | 添加其他模块                                             |
+
+3. 编译、安装
 
    ```shell
    make && make install
@@ -95,31 +105,69 @@
 
 
 
-1.2
+## 1.3 命令
+
+```shell
+#启动
+./nginx
+
+##强制停止Nginx服务
+./nginx -s stop
+#优雅地停止Nginx服务（即处理完所有请求后再停止服务）
+./nginx -s quit
+
+#重启Nginx
+./nginx -s reopen
+#重新加载Nginx配置文件，然后以优雅的方式重启Nginx
+./nginx -s reload
+
+#显示版本信息并退出
+./nginx -v
+#显示版本和配置选项信息，然后退出
+./nginx -V
+
+#
+./nginx -c
+#检测配置文件是否有语法错误，然后退出
+./nginx -t -c /nginx.conf
 
 
+```
 
-## 1.3 模块安装
+## 1.4 模块安装
 
-| 参数                                                         | 含义                                                     |
-| ------------------------------------------------------------ | -------------------------------------------------------- |
-| --prefix=PATH                                                | 指定安装路径，默认 /usr/local 下                         |
-| --sbin-path=PATH                                             | 指定 sbin 目录，一般不用指定，在安装目录下即可           |
-| --conf-path=PATH                                             | 指定配置文件的路径，也不用修改它，否则不好管理           |
-| --error-log-path=PATH 和 <br />--http-log-path=PATH（不建议指定） |                                                          |
-|                                                              |                                                          |
-| --user=USER 和 --group=GROUP                                 | 指定 nginx 允许的用户名和用户组，我们这里使用 nginx 用户 |
-| --with-http_ssl_module                                       | HTTPS 的关键模块                                         |
-| --with-http_realip_module                                    | 用于获取客户端请求的真实 IP 等作用                       |
-| --with-http_image_filter_module                              | 图片处理，实现图片放大缩小裁切等功能                     |
-| --with-http_geoip_module                                     | 用于 IP 访问控制，例如黑白名单                           |
-| --with-http_sub_module                                       | 用于字符串替换                                           |
-|                                                              |                                                          |
-|                                                              |                                                          |
-|                                                              |                                                          |
-|                                                              |                                                          |
+1. 配置
 
+   ```shell
+   ./configure --prefix=/usr/server/
+   ```
 
+   
+
+2. 编译
+
+   ```shell
+   make
+   ```
+
+   > 只 make 不 make install。
+   >
+   > 只 make 不 make install。
+   >
+   > 只 make 不 make install。
+
+3. 备份旧版，替换新版
+
+   ```shell
+   #备份
+   mv 
+   #更新
+   cp
+   #查看
+   ./nginx -V
+   ```
+
+   
 
 # 二. 配置（nginx.conf）
 
@@ -274,6 +322,30 @@ http {
 
 1. log_format
 
+   | 变量                  | 含义             |
+   | --------------------- | ---------------- |
+   | $remote_addr          | 客户端的 IP 地址 |
+   | $remote_user          |                  |
+   | $time_local           |                  |
+   | $time_iso8601         |                  |
+   | $request              |                  |
+   | $status               |                  |
+   | $body_bytes_sent      |                  |
+   | $http_referer         |                  |
+   | $http_user_agent      |                  |
+   | $http_x_forwarded_for |                  |
+   | $connection           |                  |
+   | $connection_requests  |                  |
+   | $msec                 |                  |
+   | $pipe                 |                  |
+   | $request_length       |                  |
+   | $request_time         |                  |
+   |                       |                  |
+   |                       |                  |
+   |                       |                  |
+
+   
+
    - $remote_addr 与$http_x_forwarded_for 用以记录客户端的ip地址
    - $remote_user ：用来记录客户端用户名称；
    - $time_local ：用来记录访问时间与时区；
@@ -397,7 +469,18 @@ server {
    }
    ```
 
-2. 
+
+## 2.4 日志配置
+
+​		nginx 日志配置不同位置的不同含义：
+
+1. 在 nginx 配置文件的最外层，可以配置 error_log。这个 error_log 能够记录 nginx 启动过程中的异常，也能记录日常访问过程中遇到的错误
+
+2. 在 http 段中可以配置 error_log 和 access_log，可以用于记录整个访问过程中成功的，失败的，错误的访问
+
+3. 在 server 内部配置属于专门 server 的 error_log 和 access_log，这是我们常用的，不同业务日志分开。
+
+   ​	越往配置里层，优先级越高，意味着 server 的日志记录以后并不会因为你在外层写了日志而再次记录。
 
 ## 2.4 反向代理
 
@@ -470,4 +553,4 @@ http {
 
 
 
-# 三. 模块安装
+# 三. 应用
