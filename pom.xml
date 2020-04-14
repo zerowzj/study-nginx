@@ -104,17 +104,17 @@
                             <url>scp://150.158.110.15/${deploy.dir}</url>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>upload-deploy-node2</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>upload-single</goal>
-                            <goal>sshexec</goal>
-                        </goals>
-                        <configuration>
-                            <url>scp://111.229.94.31/${deploy.dir}</url>
-                        </configuration>
-                    </execution>
+<!--                    <execution>-->
+<!--                        <id>upload-deploy-node2</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>upload-single</goal>-->
+<!--                            <goal>sshexec</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <url>scp://111.229.94.31/${deploy.dir}</url>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
                 </executions>
             </plugin>
         </plugins>
