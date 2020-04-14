@@ -194,7 +194,7 @@ events {
 }
 #http配置
 http {
-	#http全局配置
+	#全局配置
 	...
 	#负载均衡配置
 	upstream server_pool {
@@ -202,7 +202,7 @@ http {
 	}
 	#虚拟主机配置
 	server {
-		#server全局配置
+		#全局配置
 		...
 		#定位配置
 		location {
@@ -211,6 +211,8 @@ http {
 	}
 }
 ```
+
+
 
 ## 2.1 全局配置
 
@@ -238,6 +240,8 @@ pid logs/nginx.pid;
 
    主模块指令，用来指定进程pid的存储文件位置。
 
+
+
 ## 2.2 事件配置
 
 ```shell
@@ -257,6 +261,8 @@ event {
 
    事件模块指令，用于定义Nginx每个进程的最大连接数，默认是1024。最大客户端连接数由worker_processes和worker_connections决定，即Max_client=worker_processes*worker_connections。
 
+
+
 ## 2.3 http服务器配置
 
 ### 2.3.1 全局配置
@@ -270,6 +276,15 @@ http {
     
     #默认编码
     charset utf-8;
+    #客户端连接超时时间，单位是秒
+    keepalive_timeout 60;
+    
+    #开启高效传输模式。
+    sendfile on;
+    #防止网络阻塞
+    tcp_nopush on;
+    tcp_nodelay on;
+    
     #服务器名字的hash表大小
     server_names_hash_bucket_size 128;
     #客户端请求单个文件的最大字节数
@@ -278,13 +293,8 @@ http {
     client_header_buffer_size 32k;
     #指定客户端请求中较大的消息头的缓存最大数量和大小。
     large_client_header_buffers 4 64k;
-    #开启高效传输模式。
-    sendfile on;
-    #防止网络阻塞
-    tcp_nopush on;
-    tcp_nodelay on;    
-    #客户端连接超时时间，单位是秒
-    keepalive_timeout 60;
+    
+  
     #客户端请求头读取超时时间
     client_header_timeout 10;
     #设置客户端请求主体读取超时时间
@@ -302,6 +312,20 @@ http {
     fastcgi_temp_file_write_size 128k;
 }
 ```
+
+1. include
+
+   指令格式：include file。该指令主要用于将其他的Nginx配置或第三方模块的配置引用到当前的主配文件中，减少主配置文件的复杂度
+
+2. default_type
+
+   属于HTTP核心模块指令，这里设定默认类型为二进制流。也就是当文件类型未定义时使用这种方式，
+
+3. charset
+
+4. keepalive_timeout
+
+5. sendfile
 
 ### 2.3.1 日志配置
 
@@ -381,9 +405,58 @@ http {
 
 2. gzip_min_length
 
-   
 
-### 2.3.2 负载均衡配置
+
+## 2.4 虚拟主机配置
+
+### 2.4.1 基本配置
+
+```shell
+server {
+	#监听端口
+	listen  80;
+	#访问域名
+	server_name  localhost;
+	
+	#
+	index  index.html  index.htm  index.php;
+	root  /wwwroot/www.cszhi.com
+	
+	#编码格式，若网页格式与此不同，将被自动转码
+	charset  UTF-8;
+	#虚拟主机访问日志定义
+	access_log  logs/host.access.log  main;
+}
+```
+
+1. listen：指定虚拟主机的服务端口。
+2. server_name：用来指定IP地址或者域名，多个域名之间用空格分开。
+3. index：用于设定访问的默认首页地址
+4. root：用于指定虚拟主机的网页根目录，这个目录可以是相对路径，也可以是绝对路径
+5. charset：设置网页的默认编码格式
+6. access_log：指定此虚拟主机的访问日志存放路径，最后的main用于指定访问日志的输出格式。
+
+### 2.4.2 location配置
+
+​		location指令的作用是根据用户请求的URI来执行不同的应用，也就是根据用户请求的网站URL进行匹配，匹配成功即进行相关的操作。即：此模块专门将请求导向其他服务。
+
+​		
+
+1. ### 
+
+   ```shell
+   location = / {
+      #精确匹配访问网站根目录
+   }
+   location = /login {
+      #精确匹配http://xxx.com/login
+   }
+   ```
+
+
+
+
+## 2.3 负载均衡配置
 
 ​	upstream是Nginx的HTTP Upstream模块，这个模块通过一个简单的调度算法来实现客户端IP到后端服务器的负载均衡。配置如下
 
@@ -425,50 +498,6 @@ upstream NAME {
    - backup：预留的备份机器。当其他所有的非backup机器出现故障或者忙的时候，才会请求backup机器，因此这台机器的压力最轻。
    - max_fails：允许请求失败的次数，默认为1。当超过最大次数时，返回proxy_next_upstream 模块定义的错误。
    - fail_timeout：在经历了max_fails次失败后，暂停服务的时间。max_fails可以和fail_timeout一起使用。
-
-### 2.3.3 虚拟主机配置
-
-#### 2.3.3.1 基本配置
-
-```shell
-server {
-	#监听端口
-	listen 80;
-	#访问域名
-	server_name localhost;
-	index index.html index.htm index.php;
-	root /wwwroot/www.cszhi.com
-	#编码格式，若网页格式与此不同，将被自动转码
-	charset gb2312;
-	#虚拟主机访问日志定义
-	access_log logs/host.access.log  main;
-}
-```
-
-1. listen：指定虚拟主机的服务端口。
-2. server_name：用来指定IP地址或者域名，多个域名之间用空格分开。
-3. index：用于设定访问的默认首页地址
-4. root：用于指定虚拟主机的网页根目录，这个目录可以是相对路径，也可以是绝对路径
-5. charset：设置网页的默认编码格式
-6. access_log：指定此虚拟主机的访问日志存放路径，最后的main用于指定访问日志的输出格式。
-
-#### 2.3.3.2 location配置
-
-​		location指令的作用是根据用户请求的URI来执行不同的应用，也就是根据用户请求的网站URL进行匹配，匹配成功即进行相关的操作。即：此模块专门将请求导向其他服务。
-
-​		
-
-1. ### 精确匹配
-
-   ```shell
-   location = / {
-      #精确匹配访问网站根目录
-   }
-   location = /login {
-      #精确匹配http://xxx.com/login
-   }
-   ```
-
 
 ## 2.4 日志配置
 
