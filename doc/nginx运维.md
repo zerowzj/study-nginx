@@ -453,12 +453,11 @@ http {
 upstream cstm_pools {
 	#负载均衡算法
 	ip_hash/fair/least_conn;
-	#
-	server 192.168.8.11:80;
+	server 192.168.8.11:80 weight=20;
 	#其他节点挂了后该节点自动上线
 	server 192.168.8.12:80 down;
 	#
-	server 192.168.8.13:8009 weight=20 max_fails=3 fail_timeout=20s;
+	server 192.168.8.13:80 max_fails=3 fail_timeout=20s;
 	
 	#最多允许32个长连接
 	keepalive 32;
@@ -489,7 +488,7 @@ upstream cstm_pools {
 
    指定后端服务器的IP地址和端口，同时还可以设定每个后端服务器在负载均衡调度中的状态。常用的状态有：
 
-   |              |                                                              |
+   | 状态         | 描述                                                         |
    | ------------ | ------------------------------------------------------------ |
    | down         | 表示当前的server暂时不参与负载均衡                           |
    | backup       | 预留的备份机器。当其他所有的非backup机器出现故障或者忙的时候，才会请求backup机器，因此这台机器的压力最轻 |
