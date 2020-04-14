@@ -27,7 +27,7 @@ start() {
     echo "ERROR: Server running on $pid"
     exit 0
   fi
-  nohup java -jar $LIB_DIR/$JAR_NAME 2>&1 &
+  nohup java -jar $LIB_DIR/$JAR_NAME >/dev/null 2>&1 &
   sleep 1
   pid=$(get_pid)
   if [ $? -eq 0 ]; then
