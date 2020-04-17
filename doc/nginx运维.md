@@ -65,7 +65,7 @@
 
    ```shell
    ./configure \
-       --prefix=/usr/server/nginx1.16.1 \
+       --prefix=/usr/server/nginx1.16.2 \
        --with-http_stub_status_module
    ```
 
@@ -138,22 +138,21 @@
 1. 配置
 
    ```shell
-   ./configure --prefix=/usr/server/
-   ```
-
+   ./configure --prefix=/usr/server \
+         --with-http_stub_status_module
+```
    
-
 2. 编译
 
    ```shell
    make
    ```
 
-   > 只 make 不 make install。
+   > 只 make 不 make install！
    >
-   > 只 make 不 make install。
+   > 只 make 不 make install！
    >
-   > 只 make 不 make install。
+   > 只 make 不 make install！
 
 3. 备份旧版，替换新版
 
@@ -193,7 +192,7 @@ events {
 }
 #http
 http {
-	#
+	#http全局配置
 	...
 	#负载均衡
 	upstream server_pool {
@@ -201,7 +200,7 @@ http {
 	}
 	#虚拟主机
 	server {
-		#
+		#server全局配置
 		...
 		#错误页面
 		error_page  500 502 503 504  /50x.html;
@@ -483,14 +482,14 @@ upstream cstm_pools {
 
    | 状态         | 描述                                                         |
    | ------------ | ------------------------------------------------------------ |
-   | down         | 表示当前的server暂时不参与负载均衡                           |
-   | backup       | 预留的备份机器。当其他所有的非backup机器出现故障或者忙的时候，才会请求backup机器，因此这台机器的压力最轻 |
-   | max_fails    | 允许请求失败的次数，默认为1。当超过最大次数时，返回proxy_next_upstream 模块定义的错误 |
-   | fail_timeout | 在经历了max_fails次失败后，暂停服务的时间。max_fails可以和fail_timeout一起使用 |
+   | down         | 表示当前的server暂时不参与负载均衡。                         |
+   | backup       | 预留的备份机器。当其他所有的非backup机器出现故障或者忙的时候，才会请求backup机器，因此这台机器的压力最轻。 |
+   | max_fails    | 允许请求失败的次数，默认为1。当超过最大次数时，返回proxy_next_upstream 模块定义的错误。 |
+   | fail_timeout | 在经历了max_fails次失败后，暂停服务的时间。max_fails可以和fail_timeout一起使用。 |
 
 ### 2.7.1 （反向）代理
 
-​		使用nginx配置代理的时候，是要用到http_proxy模块。这个模块也是在安装nginx的时候默认安装。它的作用就是将请求转发到相应的服务器。
+​		使用nginx配置代理的时候，是要用到ngx_http_proxy_module模块。这个模块也是在安装nginx的时候默认安装。它的作用就是将请求转发到相应的服务器。
 
 ​		在配置反向代理的时候，只要配置参数proxy_pass就能完成反向代理的功能，其余的参数结合自己的实际情况去添加，不添加也可以。
 
