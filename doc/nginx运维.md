@@ -131,7 +131,6 @@
 #检测配置文件是否有语法错误，然后退出
 ./nginx -t -c /nginx.conf
 
-
 ```
 
 ## 1.4 模块安装
@@ -188,31 +187,31 @@
 ```shell
 #全局配置
 ....
-#事件配置
+#事件
 events {
 	....
 }
-#http配置
+#http
 http {
-	#全局配置
+	#
 	...
-	#负载均衡配置
+	#负载均衡
 	upstream server_pool {
 		...
 	}
-	#虚拟主机配置
+	#虚拟主机
 	server {
-		#全局配置
+		#
 		...
-		#定位配置
-		location {
+		#错误页面
+		error_page  500 502 503 504  /50x.html;
+		#定位
+		location / {
 			...
 		}
 	}
 }
 ```
-
-
 
 ## 2.1 全局配置
 
@@ -235,8 +234,6 @@ pid logs/nginx.pid;
 
    主模块指令，用来指定进程pid的存储文件位置。
 
-
-
 ## 2.2 事件配置
 
 ```shell
@@ -254,9 +251,7 @@ event {
 
 2. worker_connections
 
-   事件模块指令，用于定义Nginx每个进程的最大连接数，默认是1024。最大客户端连接数由worker_processes和worker_connections决定，即Max_client=worker_processes*worker_connections。
-
-
+   事件模块指令，用于定义Nginx每个进程的最大连接数，默认是1024。最大客户端连接数由worker_processes和worker_connections决定，即max_client=worker_processes*worker_connections。
 
 ## 2.3 http服务配置
 
@@ -599,3 +594,7 @@ http {
 # 三. 应用
 
 ## 3.1 动静分离
+
+# 四. 高可用
+
+## 4.1 
