@@ -1,4 +1,4 @@
-package study.springboot.nginx.controller;
+package study.nginx.springboot.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;

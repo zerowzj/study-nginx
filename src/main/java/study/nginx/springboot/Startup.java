@@ -1,8 +1,8 @@
-package study.springboot.nginx;
+package study.nginx.springboot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import study.springboot.nginx.support.SpringBootCfg;
+import study.nginx.springboot.support.SpringBootCfg;
 
 public class Startup {
 
