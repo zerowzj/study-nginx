@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="reconfig" basedir="." default="deploy">
-    <target name="deploy"></target>
+<project name="reconfig" basedir=".">
+    <!--  -->
+    <property environment="env"/>
+    <property name="host" value="111.229.94.31"/>
+    <property name="username" value="wzhj"/>
+    <property name="password" value="wzj!#135"/>
+    <!--  -->
+    <path id="jsch.path">
+        <pathelement location="${env.ANT_HOME}\lib\ant-jsch.jar"/>
+        <pathelement location="${env.ANT_HOME}\lib\jsch-0.1.55.jar"/>
+    </path>
+    <!--  -->
+    <taskdef name="scp" classname="org.apache.tools.ant.taskdefs.optional.ssh.Scp" classpathref="jsch.path"/>
+    <taskdef name="sshexec" classname="org.apache.tools.ant.taskdefs.optional.ssh.SSHExec" classpathref="jsch.path"/>
+
+    <target name="reconf_nginx">
+        <scp todir="${host}:${username}@${password}:/usr/server/nginx/conf/nginx.conf"
+             file="doc/conf/nginx.conf"
+             trust="true">
+        </scp>
+        <sshexec host="${host}"
+                 username="${username}"
+                 password="${password}"
+                 trust="true"
+                 command="sh /home/wzhj/server.sh restart">
+        </sshexec>
+    </target>
 </project>
